@@ -1,8 +1,6 @@
-import { useParams, useLocation, Link, Routes, Route, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useParams, useLocation, Link, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import { fetchMovieDetails } from '../../api/tmdb';
-import MovieCast from '../../components/MovieCast/MovieCast';
-import MovieReviews from '../../components/MovieReviews/MovieReviews';
 import styles from './MovieDetailsPage.module.css';
 
 function MovieDetailsPage() {
@@ -10,12 +8,13 @@ function MovieDetailsPage() {
   const [movie, setMovie] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const backLinkRef = useRef(location.state?.from || '/movies');
 
   useEffect(() => {
     fetchMovieDetails(movieId).then(setMovie);
   }, [movieId]);
 
-  const goBack = () => navigate(location.state?.from || '/movies');
+  const goBack = () => navigate(backLinkRef.current);
 
   if (!movie) return <p>Loading...</p>;
 
@@ -29,10 +28,7 @@ function MovieDetailsPage() {
         <Link to="cast">Cast</Link>
         <Link to="reviews">Reviews</Link>
       </nav>
-      <Routes>
-        <Route path="cast" element={<MovieCast />} />
-        <Route path="reviews" element={<MovieReviews />} />
-      </Routes>
+      <Outlet />
     </div>
   );
 }
